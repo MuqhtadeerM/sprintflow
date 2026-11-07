@@ -1,0 +1,528 @@
+import { addDays, format, startOfToday } from "date-fns";
+import type {
+  Column,
+  DataState,
+  Dependency,
+  Label,
+  Project,
+  Sprint,
+  Task,
+  User,
+} from "@/types";
+
+const today = startOfToday();
+const d = (offset: number): string =>
+  format(addDays(today, offset), "yyyy-MM-dd");
+const stamp = addDays(today, -10).toISOString();
+
+const users: User[] = [
+  {
+    id: "u1",
+    name: "Priya Sharma",
+    email: "priya@sprintflow.dev",
+    avatarColor: "#6366f1",
+    role: "lead",
+  },
+  {
+    id: "u2",
+    name: "Arjun Mehta",
+    email: "arjun@sprintflow.dev",
+    avatarColor: "#0ea5e9",
+    role: "member",
+  },
+  {
+    id: "u3",
+    name: "Sara Khan",
+    email: "sara@sprintflow.dev",
+    avatarColor: "#10b981",
+    role: "member",
+  },
+  {
+    id: "u4",
+    name: "Daniel Lee",
+    email: "daniel@sprintflow.dev",
+    avatarColor: "#f59e0b",
+    role: "member",
+  },
+  {
+    id: "u5",
+    name: "Meera Iyer",
+    email: "meera@sprintflow.dev",
+    avatarColor: "#ec4899",
+    role: "member",
+  },
+];
+
+const labels: Label[] = [
+  { id: "l1", name: "Frontend", color: "#3b82f6" },
+  { id: "l2", name: "Backend", color: "#8b5cf6" },
+  { id: "l3", name: "Design", color: "#ec4899" },
+  { id: "l4", name: "Bug", color: "#ef4444" },
+  { id: "l5", name: "Feature", color: "#10b981" },
+  { id: "l6", name: "DevOps", color: "#f59e0b" },
+];
+
+const projects: Project[] = [
+  {
+    id: "p1",
+    workspaceId: "w1",
+    name: "Website Redesign",
+    key: "WEB",
+    description: "Rebuild the marketing site and customer portal.",
+    color: "#6366f1",
+  },
+  {
+    id: "p2",
+    workspaceId: "w1",
+    name: "Mobile App",
+    key: "MOB",
+    description: "Cross-platform companion app.",
+    color: "#10b981",
+  },
+];
+
+const sprints: Sprint[] = [
+  {
+    id: "s1",
+    projectId: "p1",
+    name: "Sprint 1",
+    goal: "Foundations and design system",
+    startDate: d(-21),
+    endDate: d(-8),
+  },
+  {
+    id: "s2",
+    projectId: "p1",
+    name: "Sprint 2",
+    goal: "Auth, dashboard and checkout flow",
+    startDate: d(-7),
+    endDate: d(6),
+  },
+  {
+    id: "s3",
+    projectId: "p1",
+    name: "Sprint 3",
+    goal: "Performance and launch prep",
+    startDate: d(7),
+    endDate: d(20),
+  },
+  {
+    id: "s4",
+    projectId: "p2",
+    name: "Sprint 1",
+    goal: "Onboarding and push notifications",
+    startDate: d(-3),
+    endDate: d(10),
+  },
+];
+
+const columns: Column[] = [
+  {
+    id: "c1",
+    projectId: "p1",
+    name: "Backlog",
+    statusKey: "backlog",
+    wipLimit: null,
+    order: 0,
+  },
+  {
+    id: "c2",
+    projectId: "p1",
+    name: "To Do",
+    statusKey: "todo",
+    wipLimit: 5,
+    order: 1,
+  },
+  {
+    id: "c3",
+    projectId: "p1",
+    name: "In Progress",
+    statusKey: "in_progress",
+    wipLimit: 4,
+    order: 2,
+  },
+  {
+    id: "c4",
+    projectId: "p1",
+    name: "In Review",
+    statusKey: "review",
+    wipLimit: 3,
+    order: 3,
+  },
+  {
+    id: "c5",
+    projectId: "p1",
+    name: "Done",
+    statusKey: "done",
+    wipLimit: null,
+    order: 4,
+  },
+  {
+    id: "c6",
+    projectId: "p2",
+    name: "To Do",
+    statusKey: "todo",
+    wipLimit: null,
+    order: 0,
+  },
+  {
+    id: "c7",
+    projectId: "p2",
+    name: "In Progress",
+    statusKey: "in_progress",
+    wipLimit: 3,
+    order: 1,
+  },
+  {
+    id: "c8",
+    projectId: "p2",
+    name: "Review",
+    statusKey: "review",
+    wipLimit: null,
+    order: 2,
+  },
+  {
+    id: "c9",
+    projectId: "p2",
+    name: "Done",
+    statusKey: "done",
+    wipLimit: null,
+    order: 3,
+  },
+];
+
+/** Builds a full Task from a few fields, so the list below stays readable. */
+function task(
+  p: Partial<Task> & Pick<Task, "id" | "title" | "columnId" | "order">,
+): Task {
+  return {
+    projectId: "p1",
+    sprintId: "s2",
+    description: "",
+    priority: "medium",
+    assigneeId: null,
+    labelIds: [],
+    startDate: null,
+    dueDate: null,
+    estimatedHours: 4,
+    progress: 0,
+    checklist: [],
+    comments: [],
+    attachments: [],
+    createdAt: stamp,
+    updatedAt: stamp,
+    ...p,
+  };
+}
+
+const tasks: Task[] = [
+  // ---- Backlog (c1)
+  task({
+    id: "t1",
+    title: "Set up analytics tracking",
+    columnId: "c1",
+    order: 0,
+    sprintId: "s3",
+    priority: "low",
+    assigneeId: "u4",
+    labelIds: ["l2"],
+    startDate: d(8),
+    dueDate: d(11),
+    estimatedHours: 6,
+    description:
+      "Integrate **privacy-friendly** analytics.\n\n- Page views\n- Key conversion events",
+  }),
+  task({
+    id: "t2",
+    title: "Write accessibility audit report",
+    columnId: "c1",
+    order: 1,
+    sprintId: "s3",
+    priority: "medium",
+    assigneeId: "u3",
+    labelIds: ["l1", "l3"],
+    startDate: d(9),
+    dueDate: d(14),
+    estimatedHours: 10,
+  }),
+  task({
+    id: "t3",
+    title: "Plan CDN and caching strategy",
+    columnId: "c1",
+    order: 2,
+    sprintId: "s3",
+    priority: "medium",
+    assigneeId: null,
+    labelIds: ["l6"],
+    startDate: d(12),
+    dueDate: d(16),
+    estimatedHours: 8,
+  }),
+
+  // ---- To Do (c2)
+  task({
+    id: "t4",
+    title: "Design pricing page",
+    columnId: "c2",
+    order: 0,
+    priority: "high",
+    assigneeId: "u5",
+    labelIds: ["l3"],
+    startDate: d(0),
+    dueDate: d(3),
+    estimatedHours: 12,
+    checklist: [
+      { id: "ck1", text: "Wireframes", done: true },
+      { id: "ck2", text: "High-fidelity mockups", done: false },
+      { id: "ck3", text: "Design review", done: false },
+    ],
+  }),
+  task({
+    id: "t5",
+    title: "Implement password reset flow",
+    columnId: "c2",
+    order: 1,
+    priority: "high",
+    assigneeId: "u2",
+    labelIds: ["l2", "l5"],
+    startDate: d(1),
+    dueDate: d(4),
+    estimatedHours: 8,
+  }),
+  task({
+    id: "t6",
+    title: "Add dark mode to settings page",
+    columnId: "c2",
+    order: 2,
+    priority: "low",
+    assigneeId: "u1",
+    labelIds: ["l1"],
+    startDate: d(2),
+    dueDate: d(5),
+    estimatedHours: 3,
+  }),
+
+  // ---- In Progress (c3)
+  task({
+    id: "t7",
+    title: "Build checkout form",
+    columnId: "c3",
+    order: 0,
+    priority: "urgent",
+    assigneeId: "u2",
+    labelIds: ["l1", "l5"],
+    startDate: d(-4),
+    dueDate: d(2),
+    estimatedHours: 16,
+    progress: 55,
+    description:
+      "## Scope\nCard form with validation.\n\n1. Address fields\n2. Card number + expiry\n3. Error states",
+    checklist: [
+      { id: "ck4", text: "Form layout", done: true },
+      { id: "ck5", text: "Validation rules", done: true },
+      { id: "ck6", text: "Payment API integration", done: false },
+      { id: "ck7", text: "Error states", done: false },
+    ],
+    comments: [
+      {
+        id: "cm1",
+        authorId: "u1",
+        body: "Remember to handle 3-D Secure redirects.",
+        createdAt: stamp,
+      },
+    ],
+  }),
+  task({
+    id: "t8",
+    title: "Payments API endpoints",
+    columnId: "c3",
+    order: 1,
+    priority: "urgent",
+    assigneeId: "u4",
+    labelIds: ["l2"],
+    startDate: d(-6),
+    dueDate: d(-1),
+    estimatedHours: 20,
+    progress: 70,
+  }), // overdue
+  task({
+    id: "t9",
+    title: "Fix navbar overlap on tablets",
+    columnId: "c3",
+    order: 2,
+    priority: "medium",
+    assigneeId: "u3",
+    labelIds: ["l4", "l1"],
+    startDate: d(-2),
+    dueDate: d(1),
+    estimatedHours: 3,
+    progress: 30,
+  }),
+
+  // ---- In Review (c4)
+  task({
+    id: "t10",
+    title: "Login page redesign",
+    columnId: "c4",
+    order: 0,
+    priority: "high",
+    assigneeId: "u5",
+    labelIds: ["l3", "l1"],
+    startDate: d(-6),
+    dueDate: d(0),
+    estimatedHours: 10,
+    progress: 90,
+  }),
+  task({
+    id: "t11",
+    title: "Set up CI pipeline",
+    columnId: "c4",
+    order: 1,
+    priority: "medium",
+    assigneeId: "u1",
+    labelIds: ["l6"],
+    startDate: d(-5),
+    dueDate: d(-2),
+    estimatedHours: 6,
+    progress: 85,
+  }), // overdue
+
+  // ---- Done (c5)
+  task({
+    id: "t12",
+    title: "Create design tokens",
+    columnId: "c5",
+    order: 0,
+    sprintId: "s1",
+    priority: "high",
+    assigneeId: "u5",
+    labelIds: ["l3"],
+    startDate: d(-20),
+    dueDate: d(-15),
+    estimatedHours: 8,
+    progress: 100,
+  }),
+  task({
+    id: "t13",
+    title: "Project scaffolding",
+    columnId: "c5",
+    order: 1,
+    sprintId: "s1",
+    priority: "medium",
+    assigneeId: "u1",
+    labelIds: ["l1", "l6"],
+    startDate: d(-21),
+    dueDate: d(-18),
+    estimatedHours: 5,
+    progress: 100,
+  }),
+  task({
+    id: "t14",
+    title: "Database schema v1",
+    columnId: "c5",
+    order: 2,
+    priority: "high",
+    assigneeId: "u4",
+    labelIds: ["l2"],
+    startDate: d(-7),
+    dueDate: d(-3),
+    estimatedHours: 12,
+    progress: 100,
+  }),
+  task({
+    id: "t15",
+    title: "Component library: buttons & inputs",
+    columnId: "c5",
+    order: 3,
+    sprintId: "s1",
+    priority: "medium",
+    assigneeId: "u3",
+    labelIds: ["l1", "l3"],
+    startDate: d(-16),
+    dueDate: d(-10),
+    estimatedHours: 14,
+    progress: 100,
+  }),
+  task({
+    id: "t16",
+    title: "Set up error monitoring",
+    columnId: "c5",
+    order: 4,
+    priority: "low",
+    assigneeId: "u2",
+    labelIds: ["l6"],
+    startDate: d(-6),
+    dueDate: d(-4),
+    estimatedHours: 3,
+    progress: 100,
+  }),
+
+  // ---- Project 2: Mobile App
+  task({
+    id: "t17",
+    projectId: "p2",
+    sprintId: "s4",
+    title: "Onboarding carousel",
+    columnId: "c7",
+    order: 0,
+    priority: "high",
+    assigneeId: "u3",
+    labelIds: ["l1", "l5"],
+    startDate: d(-2),
+    dueDate: d(3),
+    estimatedHours: 10,
+    progress: 40,
+  }),
+  task({
+    id: "t18",
+    projectId: "p2",
+    sprintId: "s4",
+    title: "Push notification service",
+    columnId: "c6",
+    order: 0,
+    priority: "medium",
+    assigneeId: "u4",
+    labelIds: ["l2"],
+    startDate: d(1),
+    dueDate: d(7),
+    estimatedHours: 14,
+  }),
+  task({
+    id: "t19",
+    projectId: "p2",
+    sprintId: "s4",
+    title: "App icon and splash screen",
+    columnId: "c9",
+    order: 0,
+    priority: "low",
+    assigneeId: "u5",
+    labelIds: ["l3"],
+    startDate: d(-3),
+    dueDate: d(-1),
+    estimatedHours: 4,
+    progress: 100,
+  }),
+];
+
+const dependencies: Dependency[] = [
+  { id: "dep1", predecessorId: "t8", successorId: "t7" }, // payments API -> checkout form
+  { id: "dep2", predecessorId: "t14", successorId: "t8" }, // schema -> payments API
+  { id: "dep3", predecessorId: "t4", successorId: "t6" }, // pricing design -> dark mode
+  { id: "dep4", predecessorId: "t10", successorId: "t5" }, // login redesign -> password reset
+  { id: "dep5", predecessorId: "t11", successorId: "t3" }, // CI -> CDN plan
+];
+
+export function createInitialData(): DataState {
+  return {
+    workspaces: [{ id: "w1", name: "Acme Studio" }],
+    projects,
+    sprints,
+    columns,
+    tasks,
+    labels,
+    users,
+    dependencies,
+    activities: [],
+    currentUserId: "u1",
+  };
+}
