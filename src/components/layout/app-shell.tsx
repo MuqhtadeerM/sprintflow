@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { SidebarContent } from "@/components/sidebar/sidebar-content";
 import { Header } from "@/components/header/header";
+import { HydrationGate } from "@/components/shared/hydration-gate";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setMobileNav } from "@/store/slices/ui-slice";
 import { cn } from "@/lib/utils";
@@ -45,7 +46,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Header />
-        <main className="flex-1 overflow-auto p-4 md:p-6">{children}</main>
+        <main className="flex-1 overflow-auto p-4 md:p-6">
+          <HydrationGate>{children}</HydrationGate>
+        </main>
       </div>
     </div>
   );

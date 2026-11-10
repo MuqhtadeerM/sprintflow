@@ -4,6 +4,7 @@ import { Check, ChevronsUpDown, Layers } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
@@ -42,13 +43,15 @@ export function WorkspaceSwitcher({ collapsed }: { collapsed: boolean }) {
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-56">
-        <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
-        {workspaces.map((w) => (
-          <DropdownMenuItem key={w.id} className="justify-between">
-            {w.name}
-            {w.id === current?.id && <Check className="size-4" />}
-          </DropdownMenuItem>
-        ))}
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
+          {workspaces.map((w) => (
+            <DropdownMenuItem key={w.id} className="justify-between">
+              {w.name}
+              {w.id === current?.id && <Check className="size-4" />}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );
