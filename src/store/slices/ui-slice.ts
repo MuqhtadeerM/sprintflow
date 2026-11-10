@@ -4,12 +4,14 @@ export type ViewType = "board" | "gantt" | "calendar" | "list";
 
 interface UiState {
   sidebarCollapsed: boolean;
-  activeTaskId: string | null;
+  mobileNavOpen: boolean;
+  activeTaskId: string | null; // task shown in the drawer
   hydrated: boolean;
 }
 
 const initialState: UiState = {
   sidebarCollapsed: false,
+  mobileNavOpen: false,
   activeTaskId: null,
   hydrated: false,
 };
@@ -20,6 +22,9 @@ const uiSlice = createSlice({
   reducers: {
     toggleSidebar(state) {
       state.sidebarCollapsed = !state.sidebarCollapsed;
+    },
+    setMobileNav(state, action: PayloadAction<boolean>) {
+      state.mobileNavOpen = action.payload;
     },
     openTask(state, action: PayloadAction<string>) {
       state.activeTaskId = action.payload;
@@ -33,6 +38,6 @@ const uiSlice = createSlice({
   },
 });
 
-export const { toggleSidebar, openTask, closeTask, setHydrated } =
+export const { toggleSidebar, setMobileNav, openTask, closeTask, setHydrated } =
   uiSlice.actions;
 export default uiSlice.reducer;
