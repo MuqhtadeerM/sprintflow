@@ -72,7 +72,7 @@ function NavLink({
   if (!collapsed) return link;
   return (
     <Tooltip>
-      <TooltipTrigger asChild>{link}</TooltipTrigger>
+      <TooltipTrigger render={link} />
       <TooltipContent side="right">{item.label}</TooltipContent>
     </Tooltip>
   );
@@ -151,10 +151,8 @@ export function SidebarContent({
             <li key={u.id}>
               {collapsed ? (
                 <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="block p-1">
-                      <UserAvatar user={u} size={26} />
-                    </span>
+                  <TooltipTrigger render={<span className="block p-1" />}>
+                    <UserAvatar user={u} size={26} />
                   </TooltipTrigger>
                   <TooltipContent side="right">{u.name}</TooltipContent>
                 </Tooltip>
