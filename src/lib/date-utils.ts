@@ -12,3 +12,18 @@ export const formatShort = (iso: string): string =>
 /** Days from `from` to `to` (negative if `to` is earlier). */
 export const daysBetween = (from: string, to: string): number =>
   differenceInCalendarDays(parseISO(to), parseISO(from));
+
+export interface DueInfo {
+  text: string;
+  tone: "overdue" | "soon" | "normal";
+}
+
+/** "2026-11-14" -> { text: "Tomorrow", tone: "soon" } */
+export function describeDue(due: string, isDone: boolean): DueInfo {
+  const diff = daysBetween(todayStr(), due);
+  if (isDone) return { text: formatShort(due), tone: "normal" };
+  if (diff < 0) return { text: `${Math.abs(diff)}d overdue`, tone: "overdue" };
+  if (diff === 0) return { text: "Today", tone: "soon" };
+  if (diff === 1) return { text: "Tomorrow", tone: "soon" };
+  return { text: formatShort(due), tone: "normal" };
+}
