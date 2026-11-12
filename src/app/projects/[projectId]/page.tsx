@@ -2,13 +2,16 @@
 
 import { PagePlaceholder } from "@/components/shared/page-placeholder";
 import { ProjectOverview } from "@/components/dashboard/project-overview";
+import { ListView } from "@/components/task-list/list-view";
 import { useProjectContext } from "@/hooks/use-project-context";
 
-const VIEW_NOTES = {
-  board: "The Kanban board arrives in Step 8.",
-  gantt: "The Gantt timeline arrives in Step 10.",
-  calendar: "The calendar arrives in Step 9.",
-  list: "The task list arrives in Step 5.",
+const COMING_SOON = {
+  board: { title: "Board view", note: "The Kanban board arrives in Step 8." },
+  gantt: {
+    title: "Gantt view",
+    note: "The Gantt timeline arrives in Step 10.",
+  },
+  calendar: { title: "Calendar view", note: "The calendar arrives in Step 9." },
 } as const;
 
 export default function ProjectPage() {
@@ -36,10 +39,14 @@ export default function ProjectPage() {
         sprint={sprint}
       />
 
-      <PagePlaceholder
-        title={`${view[0].toUpperCase()}${view.slice(1)} view`}
-        description={VIEW_NOTES[view]}
-      />
+      {view === "list" ? (
+        <ListView projectId={projectId} sprintId={sprintId} />
+      ) : (
+        <PagePlaceholder
+          title={COMING_SOON[view].title}
+          description={COMING_SOON[view].note}
+        />
+      )}
     </div>
   );
 }
