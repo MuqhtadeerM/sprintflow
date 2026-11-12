@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
@@ -45,9 +46,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </Sheet>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <Header />
+        <Suspense fallback={<div className="h-14 border-b" />}>
+          <Header />
+        </Suspense>
         <main className="flex-1 overflow-auto p-4 md:p-6">
-          <HydrationGate>{children}</HydrationGate>
+          <Suspense fallback={null}>
+            <HydrationGate>{children}</HydrationGate>
+          </Suspense>
         </main>
       </div>
     </div>
