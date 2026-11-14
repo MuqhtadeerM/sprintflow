@@ -2,28 +2,55 @@
 
 import { useEffect, useState } from "react";
 import { Provider } from "react-redux";
-import { makeStore, type AppStore } from "./index";
-import { loadData } from "./persistence";
-import { hydrateData } from "./slices/data-slice";
-import { setHydrated } from "./slices/ui-slice";
+import { Button } from "@/components/ui/button";
+import { getDataSource } from "@/lib/data-source";
+import { bootstrap } from "./bootstrap";
+import type { AppStore } from "./index";
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
-  // null on the server and on the first client render. Effects never run
-  // during prerender, so makeStore() is never called there.
   const [store, setStore] = useState<AppStore | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    const newStore = makeStore();
-    const saved = loadData();
-    if (saved) newStore.dispatch(hydrateData(saved));
-    newStore.dispatch(setHydrated());
-    setStore(newStore);
-  }, []);
+    let cancelled = false;
+    bootstrap(getDataSource())
+      .then((s) => {
+        if (!cancelled) setStore(s);
+      })
+      .catch((e: unknown) => {
+        if (!cancelled)
+          setError(e instanceof Error ? e.message : "Unknown error");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [attempt]);
+
+  if (error) {
+    return (
+      <div
+        role="alert"
+        className="flex h-screen flex-col items-center justify-center gap-3 p-6 text-center"
+      >
+        <h1 className="text-lg font-semibold">Couldn&apos;t load SprintFlow</h1>
+        <p className="max-w-sm text-sm text-muted-foreground">{error}</p>
+        <Button
+          onClick={() => {
+            setError(null);
+            setAttempt((a) => a + 1);
+          }}
+        >
+          Try again
+        </Button>
+      </div>
+    );
+  }
 
   if (!store) {
     return (
       <div
-        className="flex h-screen items-center justify-center bg-background text-sm text-muted-foreground"
+        className="flex h-screen items-center justify-center text-sm text-muted-foreground"
         aria-busy="true"
       >
         Loading SprintFlow…
