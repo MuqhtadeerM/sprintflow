@@ -7,10 +7,12 @@ import { ThemeToggle } from "./theme-toggle";
 import { ProfileMenu } from "./profile-menu";
 import { SprintSelector } from "./sprint-selector";
 import { ViewSwitcher } from "./view-switcher";
+import { SyncIndicator } from "./sync-indicator";
+import { SearchBox } from "./search-box";
+import { FilterPopover } from "@/components/filters/filter-popover";
 import { useProjectContext } from "@/hooks/use-project-context";
 import { useAppDispatch } from "@/store/hooks";
 import { setMobileNav } from "@/store/slices/ui-slice";
-import { SyncIndicator } from "./sync-indicator";
 
 export function Header() {
   const dispatch = useAppDispatch();
@@ -40,6 +42,8 @@ export function Header() {
       {project && (
         <div className="flex flex-wrap items-center gap-2 border-t px-4 py-2">
           <SprintSelector />
+          <SearchBox />
+          <FilterPopover />
           <ViewSwitcher className="ml-auto" />
         </div>
       )}
