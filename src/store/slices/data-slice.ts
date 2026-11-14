@@ -1,8 +1,10 @@
 import { createSlice, nanoid, type PayloadAction } from "@reduxjs/toolkit";
 import { createInitialData } from "@/data/mock-data";
 import type { ActivityType, Column, DataState, Task } from "@/types";
+import { createEmptyData } from "@/lib/data-source/types";
 
-const initialState: DataState = createInitialData();
+// Starts empty. Real data arrives from the DataSource after load.
+const initialState: DataState = { ...createEmptyData(), currentUserId: "" };
 
 const nowIso = () => new Date().toISOString();
 
