@@ -16,6 +16,8 @@ interface UiState {
   hydrated: boolean;
   syncStatus: SyncStatus;
   createDialog: CreateDialogState;
+  historyLabels: { undo: string | null; redo: string | null };
+  shortcutsOpen: boolean;
 }
 
 const initialState: UiState = {
@@ -25,6 +27,8 @@ const initialState: UiState = {
   hydrated: false,
   syncStatus: "idle",
   createDialog: { open: false, columnId: null, dueDate: null },
+  historyLabels: { undo: null, redo: null },
+  shortcutsOpen: false,
 };
 
 const uiSlice = createSlice({
@@ -64,6 +68,15 @@ const uiSlice = createSlice({
     closeCreateTask(state) {
       state.createDialog.open = false;
     },
+    setHistoryLabels(
+      state,
+      action: PayloadAction<{ undo: string | null; redo: string | null }>,
+    ) {
+      state.historyLabels = action.payload;
+    },
+    setShortcutsOpen(state, action: PayloadAction<boolean>) {
+      state.shortcutsOpen = action.payload;
+    },
   },
 });
 
@@ -76,5 +89,7 @@ export const {
   setSyncStatus,
   openCreateTask,
   closeCreateTask,
+  setHistoryLabels,
+  setShortcutsOpen,
 } = uiSlice.actions;
 export default uiSlice.reducer;

@@ -83,6 +83,13 @@ const dataSlice = createSlice({
     hydrateData(_state, action: PayloadAction<DataState>) {
       return action.payload; // replace everything with the saved copy
     },
+
+    /** Used by undo/redo. Unlike hydrateData, the sync layer DOES save this one. */
+    /** Used by undo/redo. Unlike hydrateData, the sync layer DOES save this one. */
+    restoreData(_state, action: PayloadAction<DataState>) {
+      return action.payload;
+    },
+
     resetData() {
       return createInitialData();
     },
@@ -425,6 +432,7 @@ export const {
   removeDependency,
   addLabel,
   setColumnStatus,
+  restoreData,
 } = dataSlice.actions;
 
 export default dataSlice.reducer;

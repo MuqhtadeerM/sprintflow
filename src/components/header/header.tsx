@@ -9,6 +9,7 @@ import { SprintSelector } from "./sprint-selector";
 import { ViewSwitcher } from "./view-switcher";
 import { SyncIndicator } from "./sync-indicator";
 import { SearchBox } from "./search-box";
+import { HistoryButtons } from "./history-buttons";
 import { FilterPopover } from "@/components/filters/filter-popover";
 import { useProjectContext } from "@/hooks/use-project-context";
 import { useAppDispatch } from "@/store/hooks";
@@ -32,6 +33,7 @@ export function Header() {
         </Button>
         <Breadcrumbs />
         <div className="ml-auto flex items-center gap-1">
+          <HistoryButtons />
           <SyncIndicator />
           <ThemeToggle />
           <ProfileMenu />

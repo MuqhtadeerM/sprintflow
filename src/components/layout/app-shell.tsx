@@ -1,23 +1,26 @@
 "use client";
 
-import { Suspense } from "react";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { SidebarContent } from "@/components/sidebar/sidebar-content";
 import { Header } from "@/components/header/header";
 import { HydrationGate } from "@/components/shared/hydration-gate";
+import { ShortcutsDialog } from "@/components/shared/shortcuts-dialog";
+import { TaskDrawer } from "@/components/task-drawer/task-drawer";
+import { CreateTaskDialog } from "@/components/task-drawer/create-task-dialog";
+import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setMobileNav } from "@/store/slices/ui-slice";
 import { cn } from "@/lib/utils";
-import { TaskDrawer } from "@/components/task-drawer/task-drawer";
-import { CreateTaskDialog } from "@/components/task-drawer/create-task-dialog";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch();
   const pathname = usePathname();
   const collapsed = useAppSelector((s) => s.ui.sidebarCollapsed);
   const mobileOpen = useAppSelector((s) => s.ui.mobileNavOpen);
+
+  useKeyboardShortcuts();
 
   // Close the mobile drawer whenever the user navigates.
   useEffect(() => {
@@ -57,9 +60,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Suspense>
         </main>
       </div>
+
       <Suspense fallback={null}>
         <TaskDrawer />
         <CreateTaskDialog />
+        <ShortcutsDialog />
       </Suspense>
     </div>
   );

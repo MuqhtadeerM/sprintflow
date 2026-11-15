@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import uiReducer from "./slices/ui-slice";
 import dataReducer from "./slices/data-slice";
 import { createSyncMiddleware } from "./sync-middleware";
+import { createHistoryMiddleware } from "./history-store";
 import type { DataSource } from "@/lib/data-source/types";
 
 export const makeStore = (source: DataSource) =>
@@ -11,7 +12,10 @@ export const makeStore = (source: DataSource) =>
       data: dataReducer,
     },
     middleware: (getDefault) =>
-      getDefault().concat(createSyncMiddleware(source)),
+      getDefault().concat(
+        createHistoryMiddleware(),
+        createSyncMiddleware(source),
+      ),
   });
 
 export type AppStore = ReturnType<typeof makeStore>;
