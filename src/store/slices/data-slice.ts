@@ -1,6 +1,6 @@
 import { createSlice, nanoid, type PayloadAction } from "@reduxjs/toolkit";
 import { createInitialData } from "@/data/mock-data";
-import type { ActivityType, Column, DataState, Task } from "@/types";
+import type { ActivityType, Column, DataState, Task, Label } from "@/types";
 import { createEmptyData } from "@/lib/data-source/types";
 
 // Starts empty. Real data arrives from the DataSource after load.
@@ -117,12 +117,21 @@ const dataSlice = createSlice({
 
     updateTask(
       state,
-      action: PayloadAction<{ id: string; changes: TaskChanges }>,
+      action: PayloadAction<{
+        id: string;
+        changes: TaskChanges;
+        message?: string;
+      }>,
     ) {
       const task = state.tasks.find((t) => t.id === action.payload.id);
       if (!task) return;
       Object.assign(task, action.payload.changes, { updatedAt: nowIso() });
-      log(state, task.id, "updated", `Updated "${task.title}"`);
+      log(
+        state,
+        task.id,
+        "updated",
+        action.payload.message ?? `Updated "${task.title}"`,
+      );
     },
 
     deleteTask(state, action: PayloadAction<string>) {
@@ -363,6 +372,16 @@ const dataSlice = createSlice({
         state.dependencies.push(action.payload);
       },
     },
+
+    addLabel: {
+      prepare(name: string, color: string) {
+        return { payload: { id: nanoid(), name, color } satisfies Label };
+      },
+      reducer(state, action: PayloadAction<Label>) {
+        state.labels.push(action.payload);
+      },
+    },
+    
     removeDependency(state, action: PayloadAction<string>) {
       state.dependencies = state.dependencies.filter(
         (d) => d.id !== action.payload,

@@ -10,6 +10,8 @@ import { HydrationGate } from "@/components/shared/hydration-gate";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setMobileNav } from "@/store/slices/ui-slice";
 import { cn } from "@/lib/utils";
+import { TaskDrawer } from "@/components/task-drawer/task-drawer";
+import { CreateTaskDialog } from "@/components/task-drawer/create-task-dialog";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch();
@@ -55,6 +57,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Suspense>
         </main>
       </div>
+      <Suspense fallback={null}>
+        <TaskDrawer />
+        <CreateTaskDialog />
+      </Suspense>
     </div>
   );
 }

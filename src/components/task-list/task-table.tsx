@@ -48,6 +48,7 @@ interface TaskTableProps {
   selected: Set<string>;
   onToggle: (id: string) => void;
   onToggleAll: (checked: boolean) => void;
+  onOpen: (id: string) => void;
 }
 
 function SortHeader({
@@ -122,6 +123,7 @@ export function TaskTable({
   selected,
   onToggle,
   onToggleAll,
+  onOpen,
 }: TaskTableProps) {
   const glowRef = useRef<HTMLDivElement>(null);
 
@@ -248,14 +250,16 @@ export function TaskTable({
                       />
                     </td>
                     <td className="max-w-[320px] px-3 py-3">
-                      <p
+                      <button
+                        type="button"
+                        onClick={() => onOpen(task.id)}
                         className={cn(
-                          "truncate text-sm font-medium",
+                          "block w-full truncate rounded text-left text-sm font-medium outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring",
                           done && "text-muted-foreground line-through",
                         )}
                       >
                         {task.title}
-                      </p>
+                      </button>
                     </td>
                     {visible.has("status") && (
                       <td className="px-3 py-3">
@@ -342,14 +346,16 @@ export function TaskTable({
                 className="mt-0.5"
               />
               <div className="min-w-0 flex-1 space-y-2">
-                <p
+                <button
+                  type="button"
+                  onClick={() => onOpen(task.id)}
                   className={cn(
-                    "text-sm font-medium",
+                    "block w-full rounded text-left text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     done && "text-muted-foreground line-through",
                   )}
                 >
                   {task.title}
-                </p>
+                </button>
                 <div className="flex flex-wrap items-center gap-2">
                   {column && (
                     <StatusBadge

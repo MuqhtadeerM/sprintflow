@@ -129,6 +129,61 @@
   }
 }
 
+/* ---------- Markdown ---------- */
+.markdown-body {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.markdown-body > * + * {
+  margin-top: 0.75em;
+}
+.markdown-body h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.markdown-body h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.markdown-body h3 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.markdown-body ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+.markdown-body ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+.markdown-body a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+.markdown-body blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: 0.75rem;
+  color: var(--muted-foreground);
+}
+.markdown-body code {
+  background: var(--muted);
+  padding: 0.1em 0.35em;
+  border-radius: 0.3rem;
+  font-size: 0.85em;
+}
+.markdown-body pre {
+  background: var(--muted);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+.markdown-body pre code {
+  background: none;
+  padding: 0;
+}
+
 /* ---------- SprintFlow animations ---------- */
 @keyframes row-in {
   from {
@@ -192,5 +247,3 @@
     animation: none;
   }
 }
-
-

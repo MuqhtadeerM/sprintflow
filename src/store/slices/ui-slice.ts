@@ -3,12 +3,19 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 export type ViewType = "board" | "gantt" | "calendar" | "list";
 export type SyncStatus = "idle" | "saving" | "error";
 
+interface CreateDialogState {
+  open: boolean;
+  columnId: string | null;
+  dueDate: string | null;
+}
+
 interface UiState {
   sidebarCollapsed: boolean;
   mobileNavOpen: boolean;
   activeTaskId: string | null;
   hydrated: boolean;
   syncStatus: SyncStatus;
+  createDialog: CreateDialogState;
 }
 
 const initialState: UiState = {
@@ -17,6 +24,7 @@ const initialState: UiState = {
   activeTaskId: null,
   hydrated: false,
   syncStatus: "idle",
+  createDialog: { open: false, columnId: null, dueDate: null },
 };
 
 const uiSlice = createSlice({
@@ -41,6 +49,21 @@ const uiSlice = createSlice({
     setSyncStatus(state, action: PayloadAction<SyncStatus>) {
       state.syncStatus = action.payload;
     },
+    openCreateTask(
+      state,
+      action: PayloadAction<
+        { columnId?: string; dueDate?: string } | undefined
+      >,
+    ) {
+      state.createDialog = {
+        open: true,
+        columnId: action.payload?.columnId ?? null,
+        dueDate: action.payload?.dueDate ?? null,
+      };
+    },
+    closeCreateTask(state) {
+      state.createDialog.open = false;
+    },
   },
 });
 
@@ -51,5 +74,7 @@ export const {
   closeTask,
   setHydrated,
   setSyncStatus,
+  openCreateTask,
+  closeCreateTask,
 } = uiSlice.actions;
 export default uiSlice.reducer;
