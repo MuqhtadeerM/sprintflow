@@ -5,7 +5,8 @@ import {
   DndContext,
   DragOverlay,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   closestCorners,
   useSensor,
   useSensors,
@@ -112,8 +113,12 @@ export function Board({
   const activeTask = activeId ? taskById.get(activeId) : undefined;
 
   const sensors = useSensors(
-    // Moving 6px before a drag starts keeps clicks from becoming drags.
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    // Mouse: move 6px before a drag starts, so a plain click still opens the card.
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    // Touch: press and hold ~250ms, so a normal swipe still scrolls the board.
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 250, tolerance: 8 },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),

@@ -6,7 +6,6 @@ import {
   CalendarDays,
   Copy,
   ExternalLink,
-  GripVertical,
   ListChecks,
   MoreHorizontal,
   MoveRight,
@@ -252,27 +251,12 @@ export function SortableTaskCard({
     attributes,
     listeners,
     setNodeRef,
-    setActivatorNodeRef,
     transform,
     transition,
     isDragging,
   } = useSortable({ id: task.id });
 
   const menuActions = buildActions(task, lookups, actions);
-
-  const handle = (
-    <button
-      type="button"
-      ref={setActivatorNodeRef}
-      {...attributes}
-      {...listeners}
-      onClick={(e) => e.stopPropagation()}
-      aria-label={`Drag “${task.title}”. Press space to pick up, arrow keys to move.`}
-      className="flex size-7 cursor-grab touch-none items-center justify-center rounded-md text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring active:cursor-grabbing"
-    >
-      <GripVertical className="size-4" />
-    </button>
-  );
 
   // The wrapper span stops clicks from React-bubbling (even from the portaled
   // menu) up to the card's onClick, which would also open the drawer.
@@ -316,22 +300,24 @@ export function SortableTaskCard({
   );
 
   return (
+    // The whole card is the drag target: attributes + listeners live on the wrapper.
     <div
       ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      aria-label={`${task.title}. Press space to pick up, arrow keys to move, space to drop.`}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={cn(isDragging && "opacity-30")}
+      className={cn(
+        "cursor-grab rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring active:cursor-grabbing",
+        isDragging && "opacity-30",
+      )}
     >
       <ContextMenu>
         <ContextMenuTrigger
           className="block"
           onClick={() => actions.open(task.id)}
         >
-          <TaskCardBody
-            task={task}
-            lookups={lookups}
-            handle={handle}
-            menu={kebab}
-          />
+          <TaskCardBody task={task} lookups={lookups} menu={kebab} />
         </ContextMenuTrigger>
         <ContextMenuContent className="w-52">
           {menuActions.map((a) => (
