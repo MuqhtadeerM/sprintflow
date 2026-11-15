@@ -3,7 +3,7 @@
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { useAppDispatch, useAppStore } from "@/store/hooks";
-import { moveTask } from "@/store/slices/data-slice";
+import { duplicateTask, moveTask } from "@/store/slices/data-slice";
 import type { Column } from "@/types";
 
 export function useTaskActions() {
@@ -36,5 +36,26 @@ export function useTaskActions() {
     [dispatch, store],
   );
 
-  return { moveToColumn };
+  /** Duplicates a task into its own column. Returns the new id, or null if blocked. */
+  const duplicate = useCallback(
+    (taskId: string): string | null => {
+      const { tasks, columns } = store.getState().data;
+      const task = tasks.find((t) => t.id === taskId);
+      if (!task) return null;
+      const column = columns.find((c) => c.id === task.columnId);
+      if (column && column.wipLimit !== null) {
+        const inColumn = tasks.filter((t) => t.columnId === column.id).length;
+        if (inColumn >= column.wipLimit) {
+          toast.error(`“${column.name}” is full`, {
+            description: "A copy would exceed the WIP limit.",
+          });
+          return null;
+        }
+      }
+      return dispatch(duplicateTask(taskId)).payload.newId;
+    },
+    [dispatch, store],
+  );
+
+  return { moveToColumn, duplicate };
 }

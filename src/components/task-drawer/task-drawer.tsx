@@ -68,7 +68,7 @@ function Field({
 
 function TaskDrawerBody({ task }: { task: Task }) {
   const dispatch = useAppDispatch();
-  const { moveToColumn } = useTaskActions();
+  const { moveToColumn, duplicate } = useTaskActions();
   const allColumns = useAppSelector((s) => s.data.columns);
   const allSprints = useAppSelector((s) => s.data.sprints);
   const users = useAppSelector((s) => s.data.users);
