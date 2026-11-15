@@ -4,16 +4,9 @@ import { PagePlaceholder } from "@/components/shared/page-placeholder";
 import { ProjectOverview } from "@/components/dashboard/project-overview";
 import { FilterChips } from "@/components/filters/filter-chips";
 import { Board } from "@/components/kanban/board";
+import { CalendarView } from "@/components/calendar/calendar-view";
 import { ListView } from "@/components/task-list/list-view";
 import { useProjectContext } from "@/hooks/use-project-context";
-
-const COMING_SOON = {
-  gantt: {
-    title: "Gantt view",
-    note: "The Gantt timeline arrives in Step 10.",
-  },
-  calendar: { title: "Calendar view", note: "The calendar arrives in Step 9." },
-} as const;
 
 export default function ProjectPage() {
   const { projectId, project, sprintId, sprint, view } = useProjectContext();
@@ -46,10 +39,13 @@ export default function ProjectPage() {
       {view === "list" && (
         <ListView projectId={projectId} sprintId={sprintId} />
       )}
-      {(view === "gantt" || view === "calendar") && (
+      {view === "calendar" && (
+        <CalendarView projectId={projectId} sprintId={sprintId} />
+      )}
+      {view === "gantt" && (
         <PagePlaceholder
-          title={COMING_SOON[view].title}
-          description={COMING_SOON[view].note}
+          title="Gantt view"
+          description="The Gantt timeline arrives in Step 10."
         />
       )}
     </div>
