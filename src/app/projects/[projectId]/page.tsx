@@ -7,6 +7,7 @@ import { Board } from "@/components/kanban/board";
 import { CalendarView } from "@/components/calendar/calendar-view";
 import { ListView } from "@/components/task-list/list-view";
 import { useProjectContext } from "@/hooks/use-project-context";
+import { GanttChart } from "@/components/gantt/gantt-chart";
 
 export default function ProjectPage() {
   const { projectId, project, sprintId, sprint, view } = useProjectContext();
@@ -47,6 +48,9 @@ export default function ProjectPage() {
           title="Gantt view"
           description="The Gantt timeline arrives in Step 10."
         />
+      )}
+      {view === "gantt" && (
+        <GanttChart projectId={projectId} sprintId={sprintId} sprint={sprint} />
       )}
     </div>
   );
