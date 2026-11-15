@@ -2,12 +2,12 @@
 
 import { PagePlaceholder } from "@/components/shared/page-placeholder";
 import { ProjectOverview } from "@/components/dashboard/project-overview";
+import { FilterChips } from "@/components/filters/filter-chips";
+import { Board } from "@/components/kanban/board";
 import { ListView } from "@/components/task-list/list-view";
 import { useProjectContext } from "@/hooks/use-project-context";
-import { FilterChips } from "@/components/filters/filter-chips";
 
 const COMING_SOON = {
-  board: { title: "Board view", note: "The Kanban board arrives in Step 8." },
   gantt: {
     title: "Gantt view",
     note: "The Gantt timeline arrives in Step 10.",
@@ -39,11 +39,14 @@ export default function ProjectPage() {
         sprintId={sprintId}
         sprint={sprint}
       />
+
       <FilterChips />
 
-      {view === "list" ? (
+      {view === "board" && <Board projectId={projectId} sprintId={sprintId} />}
+      {view === "list" && (
         <ListView projectId={projectId} sprintId={sprintId} />
-      ) : (
+      )}
+      {(view === "gantt" || view === "calendar") && (
         <PagePlaceholder
           title={COMING_SOON[view].title}
           description={COMING_SOON[view].note}

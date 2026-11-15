@@ -316,7 +316,6 @@ const dataSlice = createSlice({
       const column = state.columns.find((c) => c.id === action.payload.id);
       if (column) column.wipLimit = action.payload.wipLimit;
     },
-
     setColumnStatus(
       state,
       action: PayloadAction<{ id: string; statusKey: StatusKey }>,
@@ -324,7 +323,7 @@ const dataSlice = createSlice({
       const column = state.columns.find((c) => c.id === action.payload.id);
       if (column) column.statusKey = action.payload.statusKey;
     },
-    
+
     /** moveToColumnId = where the tasks go; null = delete them with the column. */
     deleteColumn(
       state,
@@ -425,6 +424,7 @@ export const {
   addDependency,
   removeDependency,
   addLabel,
+  setColumnStatus,
 } = dataSlice.actions;
 
 export default dataSlice.reducer;
