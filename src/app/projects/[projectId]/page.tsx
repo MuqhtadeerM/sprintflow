@@ -4,6 +4,7 @@ import { PagePlaceholder } from "@/components/shared/page-placeholder";
 import { ProjectOverview } from "@/components/dashboard/project-overview";
 import { ListView } from "@/components/task-list/list-view";
 import { useProjectContext } from "@/hooks/use-project-context";
+import { FilterChips } from "@/components/filters/filter-chips";
 
 const COMING_SOON = {
   board: { title: "Board view", note: "The Kanban board arrives in Step 8." },
@@ -38,6 +39,7 @@ export default function ProjectPage() {
         sprintId={sprintId}
         sprint={sprint}
       />
+      <FilterChips />
 
       {view === "list" ? (
         <ListView projectId={projectId} sprintId={sprintId} />

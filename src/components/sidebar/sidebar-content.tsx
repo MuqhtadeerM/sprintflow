@@ -95,6 +95,11 @@ export function SidebarContent({
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
 
+  // The project we're looking at, or the first one if we're on another page.
+  const targetProjectId = pathname.startsWith("/projects/")
+    ? pathname.split("/")[2]
+    : (projects[0]?.id ?? "");
+
   return (
     <div className="flex h-full flex-col">
       <div className="p-2">
@@ -147,23 +152,37 @@ export function SidebarContent({
         <ul
           className={cn("space-y-1", collapsed && "flex flex-col items-center")}
         >
-          {users.map((u) => (
-            <li key={u.id}>
-              {collapsed ? (
-                <Tooltip>
-                  <TooltipTrigger render={<span className="block p-1" />}>
-                    <UserAvatar user={u} size={26} />
-                  </TooltipTrigger>
-                  <TooltipContent side="right">{u.name}</TooltipContent>
-                </Tooltip>
-              ) : (
-                <div className="flex items-center gap-3 px-2.5 py-1.5 text-sm">
-                  <UserAvatar user={u} size={24} />
-                  <span className="truncate">{u.name}</span>
-                </div>
-              )}
-            </li>
-          ))}
+          {users.map((u) => {
+            const href = `/projects/${targetProjectId}?assignee=${u.id}`;
+            return (
+              <li key={u.id}>
+                {collapsed ? (
+                  <Tooltip>
+                    <TooltipTrigger
+                      render={
+                        <Link
+                          href={href}
+                          aria-label={`Show ${u.name}'s tasks`}
+                          className="block rounded-full p-1 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        />
+                      }
+                    >
+                      <UserAvatar user={u} size={26} />
+                    </TooltipTrigger>
+                    <TooltipContent side="right">{u.name}</TooltipContent>
+                  </Tooltip>
+                ) : (
+                  <Link
+                    href={href}
+                    className="flex items-center gap-3 rounded-lg px-2.5 py-1.5 text-sm outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <UserAvatar user={u} size={24} />
+                    <span className="truncate">{u.name}</span>
+                  </Link>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </nav>
 

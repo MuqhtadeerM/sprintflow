@@ -1,8 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check, Columns3, Search, SearchX, X } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Check, Columns3, SearchX, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,6 +21,8 @@ import {
 } from "./task-table";
 import { BulkDock } from "./bulk-dock";
 import { useProjectTasks } from "@/hooks/use-project-tasks";
+import { useFilters } from "@/hooks/use-filters";
+import { hasActiveFilters } from "@/lib/filter-utils";
 import { useAppSelector } from "@/store/hooks";
 import { PRIORITY_META } from "@/lib/task-meta";
 import type { Column, Task, User } from "@/types";
@@ -40,7 +41,7 @@ function compareTasks(
 ): number {
   const nullsLast = (x: string | number | null, y: string | number | null) => {
     if (x === null && y === null) return 0;
-    if (x === null) return 1; // missing values always sink to the bottom
+    if (x === null) return 1; // missing values sink to the bottom
     if (y === null) return -1;
     return typeof x === "number" && typeof y === "number"
       ? x - y
@@ -74,12 +75,12 @@ function compareTasks(
 }
 
 export function ListView({ projectId, sprintId }: ListViewProps) {
-  const tasks = useProjectTasks(projectId, sprintId);
+  const tasks = useProjectTasks(projectId, sprintId); // already filtered
+  const { filters, clearAll } = useFilters();
   const allColumns = useAppSelector((s) => s.data.columns);
   const users = useAppSelector((s) => s.data.users);
   const labels = useAppSelector((s) => s.data.labels);
 
-  const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("due");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -96,21 +97,16 @@ export function ListView({ projectId, sprintId }: ListViewProps) {
   );
 
   const rows = useMemo(() => {
-    const columnById = new Map(allColumns.map((c) => [c.id, c]));
-    const userById = new Map(users.map((u) => [u.id, u]));
-    const q = query.trim().toLowerCase();
-    const matching = q
-      ? tasks.filter((t) => t.title.toLowerCase().includes(q))
-      : tasks;
+    const columnById = new Map(allColumns.map((c) => [c.id, c] as const));
+    const userById = new Map(users.map((u) => [u.id, u] as const));
     const sign = sortDir === "asc" ? 1 : -1;
-    // Missing values must stay at the bottom in BOTH directions, so only flip real comparisons.
-    return [...matching].sort((a, b) => {
-      const flipped = sign * compareTasks(a, b, sortKey, columnById, userById);
-      return flipped !== 0 ? flipped : a.order - b.order;
+    return [...tasks].sort((a, b) => {
+      const result = sign * compareTasks(a, b, sortKey, columnById, userById);
+      return result !== 0 ? result : a.order - b.order;
     });
-  }, [tasks, allColumns, users, query, sortKey, sortDir]);
+  }, [tasks, allColumns, users, sortKey, sortDir]);
 
-  // Drop selections for tasks that no longer exist or are filtered out.
+  // Selections for tasks that were deleted or filtered out are ignored.
   const visibleSelected = useMemo(() => {
     const ids = new Set(rows.map((t) => t.id));
     return [...selected].filter((id) => ids.has(id));
@@ -143,22 +139,14 @@ export function ListView({ projectId, sprintId }: ListViewProps) {
       return next;
     });
 
+  const filtered = hasActiveFilters(filters);
+
   return (
     <div className="space-y-4 pb-24">
       <div className="flex flex-wrap items-center gap-2">
-        <div className="relative min-w-[200px] flex-1 sm:max-w-xs">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search tasks…"
-            aria-label="Search tasks"
-            className="pl-8"
-          />
-        </div>
-
         <p className="text-sm text-muted-foreground" aria-live="polite">
           {rows.length} task{rows.length === 1 ? "" : "s"}
+          {filtered && " match your filters"}
         </p>
 
         <DropdownMenu>
@@ -190,18 +178,20 @@ export function ListView({ projectId, sprintId }: ListViewProps) {
         <EmptyState
           icon={SearchX}
           title={
-            query ? "No tasks match your search" : "No tasks in this sprint yet"
+            filtered
+              ? "No tasks match your filters"
+              : "No tasks in this sprint yet"
           }
           description={
-            query
-              ? `Nothing found for “${query}”. Try a different word.`
+            filtered
+              ? "Try removing a filter, or clear them all to see every task."
               : "Tasks you create will show up here, in every view."
           }
           action={
-            query ? (
-              <Button variant="outline" size="sm" onClick={() => setQuery("")}>
+            filtered ? (
+              <Button variant="outline" size="sm" onClick={clearAll}>
                 <X className="size-4" />
-                Clear search
+                Clear all filters
               </Button>
             ) : undefined
           }
