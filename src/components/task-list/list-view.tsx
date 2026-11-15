@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check, Columns3, SearchX, X } from "lucide-react";
+import { Check, Columns3, Plus, SearchX, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,7 +23,8 @@ import { BulkDock } from "./bulk-dock";
 import { useProjectTasks } from "@/hooks/use-project-tasks";
 import { useFilters } from "@/hooks/use-filters";
 import { hasActiveFilters } from "@/lib/filter-utils";
-import { useAppSelector } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { openCreateTask, openTask } from "@/store/slices/ui-slice";
 import { PRIORITY_META } from "@/lib/task-meta";
 import type { Column, Task, User } from "@/types";
 
@@ -75,6 +76,7 @@ function compareTasks(
 }
 
 export function ListView({ projectId, sprintId }: ListViewProps) {
+  const dispatch = useAppDispatch();
   const tasks = useProjectTasks(projectId, sprintId); // already filtered
   const { filters, clearAll } = useFilters();
   const allColumns = useAppSelector((s) => s.data.columns);
@@ -149,10 +151,17 @@ export function ListView({ projectId, sprintId }: ListViewProps) {
           {filtered && " match your filters"}
         </p>
 
+        <Button
+          size="sm"
+          className="ml-auto"
+          onClick={() => dispatch(openCreateTask())}
+        >
+          <Plus className="size-4" />
+          New task
+        </Button>
+
         <DropdownMenu>
-          <DropdownMenuTrigger
-            render={<Button variant="outline" size="sm" className="ml-auto" />}
-          >
+          <DropdownMenuTrigger render={<Button variant="outline" size="sm" />}>
             <Columns3 className="size-4" />
             Columns
           </DropdownMenuTrigger>
@@ -209,6 +218,7 @@ export function ListView({ projectId, sprintId }: ListViewProps) {
           selected={new Set(visibleSelected)}
           onToggle={toggleOne}
           onToggleAll={toggleAll}
+          onOpen={(id) => dispatch(openTask(id))}
         />
       )}
 

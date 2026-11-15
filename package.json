@@ -21,6 +21,7 @@
     "react": "19.3.0",
     "react-day-picker": "^10.0.2",
     "react-dom": "19.3.0",
+    "react-markdown": "^10.1.0",
     "react-redux": "^9.3.1",
     "redux-undo": "^1.1.0",
     "shadcn": "^4.23.0",

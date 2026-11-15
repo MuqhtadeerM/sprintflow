@@ -1,6 +1,13 @@
 import { createSlice, nanoid, type PayloadAction } from "@reduxjs/toolkit";
 import { createInitialData } from "@/data/mock-data";
-import type { ActivityType, Column, DataState, Task, Label } from "@/types";
+import type {
+  ActivityType,
+  Column,
+  DataState,
+  Task,
+  Label,
+  StatusKey,
+} from "@/types";
 import { createEmptyData } from "@/lib/data-source/types";
 
 // Starts empty. Real data arrives from the DataSource after load.
@@ -372,7 +379,13 @@ const dataSlice = createSlice({
         state.dependencies.push(action.payload);
       },
     },
+    removeDependency(state, action: PayloadAction<string>) {
+      state.dependencies = state.dependencies.filter(
+        (d) => d.id !== action.payload,
+      );
+    },
 
+    /* ---------- labels ---------- */
     addLabel: {
       prepare(name: string, color: string) {
         return { payload: { id: nanoid(), name, color } satisfies Label };
@@ -380,12 +393,6 @@ const dataSlice = createSlice({
       reducer(state, action: PayloadAction<Label>) {
         state.labels.push(action.payload);
       },
-    },
-    
-    removeDependency(state, action: PayloadAction<string>) {
-      state.dependencies = state.dependencies.filter(
-        (d) => d.id !== action.payload,
-      );
     },
   },
 });
@@ -408,6 +415,7 @@ export const {
   deleteColumn,
   addDependency,
   removeDependency,
+  addLabel,
 } = dataSlice.actions;
 
 export default dataSlice.reducer;
