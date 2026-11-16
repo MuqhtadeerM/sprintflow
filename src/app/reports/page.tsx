@@ -1,7 +1,5 @@
-import { PagePlaceholder } from "@/components/shared/page-placeholder";
+import { ReportsView } from "@/components/dashboard/reports-view";
 
 export default function ReportsPage() {
-  return (
-    <PagePlaceholder title="Reports" description="Reports arrive in Step 12." />
-  );
+  return <ReportsView />;
 }
