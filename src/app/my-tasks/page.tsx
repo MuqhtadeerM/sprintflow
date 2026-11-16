@@ -1,10 +1,5 @@
-import { PagePlaceholder } from "@/components/shared/page-placeholder";
+import { MyTasksView } from "@/components/dashboard/my-tasks-view";
 
 export default function MyTasksPage() {
-  return (
-    <PagePlaceholder
-      title="My Tasks"
-      description="Your assigned tasks will appear here."
-    />
-  );
+  return <MyTasksView />;
 }

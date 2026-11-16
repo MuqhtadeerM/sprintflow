@@ -21,7 +21,7 @@ interface ProjectOverviewProps {
   sprint: Sprint | null;
 }
 
-function StatCard({
+export function StatCard({
   label,
   value,
   icon: Icon,

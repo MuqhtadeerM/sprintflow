@@ -1,10 +1,5 @@
-import { PagePlaceholder } from "@/components/shared/page-placeholder";
+import { ProjectsView } from "@/components/dashboard/projects-view";
 
 export default function ProjectsPage() {
-  return (
-    <PagePlaceholder
-      title="Projects"
-      description="Pick a project from the sidebar."
-    />
-  );
+  return <ProjectsView />;
 }
