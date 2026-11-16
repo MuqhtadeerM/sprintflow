@@ -1,10 +1,5 @@
-import { PagePlaceholder } from "@/components/shared/page-placeholder";
+import { RedirectToProject } from "@/components/shared/redirect-to-project";
 
 export default function CalendarPage() {
-  return (
-    <PagePlaceholder
-      title="Calendar"
-      description="The calendar view arrives in Step 9."
-    />
-  );
+  return <RedirectToProject view="calendar" />;
 }

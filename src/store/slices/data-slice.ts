@@ -84,6 +84,20 @@ const dataSlice = createSlice({
       return action.payload; // replace everything with the saved copy
     },
 
+    renameWorkspace(
+      state,
+      action: PayloadAction<{ id: string; name: string }>,
+    ) {
+      const workspace = state.workspaces.find(
+        (w) => w.id === action.payload.id,
+      );
+      if (workspace) workspace.name = action.payload.name;
+    },
+    /** Replaces everything from a backup file. Recorded in history, so it can be undone. */
+    importData(_state, action: PayloadAction<DataState>) {
+      return action.payload;
+    },
+
     /** Used by undo/redo. Unlike hydrateData, the sync layer DOES save this one. */
     /** Used by undo/redo. Unlike hydrateData, the sync layer DOES save this one. */
     restoreData(_state, action: PayloadAction<DataState>) {
@@ -433,6 +447,7 @@ export const {
   addLabel,
   setColumnStatus,
   restoreData,
+  renameWorkspace
 } = dataSlice.actions;
 
 export default dataSlice.reducer;

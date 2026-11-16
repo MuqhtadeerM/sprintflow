@@ -1,10 +1,5 @@
-import { PagePlaceholder } from "@/components/shared/page-placeholder";
+import { RedirectToProject } from "@/components/shared/redirect-to-project";
 
 export default function TimelinePage() {
-  return (
-    <PagePlaceholder
-      title="Timeline"
-      description="The Gantt timeline arrives in Step 10."
-    />
-  );
+  return <RedirectToProject view="gantt" />;
 }

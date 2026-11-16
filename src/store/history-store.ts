@@ -34,6 +34,8 @@ const LABELS: Record<string, string> = {
   "data/removeDependency": "Remove dependency",
   "data/addLabel": "Create label",
   "data/resetData": "Reset demo data",
+  "data/renameWorkspace": "Rename workspace",
+  "data/importData": "Import backup",
 };
 
 function labelFor(action: UnknownAction): string {

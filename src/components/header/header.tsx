@@ -14,6 +14,7 @@ import { FilterPopover } from "@/components/filters/filter-popover";
 import { useProjectContext } from "@/hooks/use-project-context";
 import { useAppDispatch } from "@/store/hooks";
 import { setMobileNav } from "@/store/slices/ui-slice";
+import { NotificationsBell } from "./notifications-bell";
 
 export function Header() {
   const dispatch = useAppDispatch();
@@ -35,6 +36,7 @@ export function Header() {
         <div className="ml-auto flex items-center gap-1">
           <HistoryButtons />
           <SyncIndicator />
+          <NotificationsBell />
           <ThemeToggle />
           <ProfileMenu />
         </div>
