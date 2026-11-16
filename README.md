@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SprintFlow
 
-## Getting Started
+A project management app with four synchronized views (Kanban, Gantt, Calendar, List) over one shared dataset.
+Built with Next.js 16, React, TypeScript (strict), Tailwind CSS v4, shadcn/ui (Base UI), Redux Toolkit,
+@dnd-kit, date-fns, Recharts and react-markdown.
 
-First, run the development server:
+## Quick start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local      # Windows: copy .env.example .env.local
+npm run dev                     # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Requires Node 20+.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command                       | Purpose                     |
+| ----------------------------- | --------------------------- |
+| `npm run dev`                 | Development server          |
+| `npm run typecheck`           | TypeScript check (no emit)  |
+| `npm run lint`                | ESLint                      |
+| `npm run build` / `npm start` | Production build and server |
 
-## Learn More
+## Data modes
 
-To learn more about Next.js, take a look at the following resources:
+Set `NEXT_PUBLIC_DATA_SOURCE` in `.env.local`, then restart the dev server:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `local` (default): data lives in your browser's localStorage.
+- `http`: data is saved through `/api/*` into `.data/db.json`. Open the app in another browser and the same data appears.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The app only talks to a small `DataSource` interface (`src/lib/data-source`). To use a real database, rewrite the
+two route handlers in `src/app/api` (and `src/server/db.ts`). The UI does not change.
+The first run seeds sample data (2 projects, 4 sprints, 19 tasks, 5 users).
 
-## Deploy on Vercel
+## Architecture
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **One store.** `data` slice holds everything. Every view reads it and dispatches to it, so views cannot disagree.
+- **URL as state.** View, sprint, filters, calendar mode and date live in the query string: shareable and refresh-safe.
+- **Status comes from the column.** A task stores `columnId`. Each column maps to a status category.
+- **Sync middleware.** Diffs state after each action and saves only the changed rows (optimistic, with retry).
+- **History middleware.** Snapshot-based undo/redo. Same-tick actions merge into one step.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+  app/            routes (dashboard, projects, reports, settings, api)
+  components/     layout, sidebar, header, kanban, gantt, calendar, task-list, task-drawer, filters, dashboard, shared, ui
+  store/          slices, sync + history middleware, bootstrap
+  hooks/          filters, project context, calendar nav, shortcuts, task actions
+  lib/            pure logic (filters, dates, gantt, kanban, calendar, reports, backup, data-source)
+  types/          domain models
+  data/           seed data
+```
+
+## Features
+
+Kanban (drag the whole card, WIP limits, column management, context menu), Gantt (drag, resize, dependency arrows,
+conflict detection, zoom), Calendar (month/week/day, drag to reschedule), List (sort, inline edit, bulk actions),
+task drawer (Markdown, checklist, comments, activity, dependencies, attachments), shared URL filters, undo/redo,
+keyboard shortcuts, dashboard, reports with CSV export, notifications, backup import/export, dark mode, responsive layout.
+
+## Keyboard shortcuts
+
+`C` new task · `F` or `/` search · `Ctrl/Cmd+Z` undo · `Ctrl/Cmd+Shift+Z` redo · `Esc` close · `?` help
+
+## Known limitations
+
+See the checklist in the project notes: no authentication, no multi-user conflict handling, attachments store
+metadata only, the JSON-file API does not work on serverless hosts, history resets on refresh.
