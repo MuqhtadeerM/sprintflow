@@ -447,7 +447,8 @@ export const {
   addLabel,
   setColumnStatus,
   restoreData,
-  renameWorkspace
+  renameWorkspace,
+  importData,
 } = dataSlice.actions;
 
 export default dataSlice.reducer;

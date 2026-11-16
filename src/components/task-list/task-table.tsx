@@ -11,6 +11,7 @@ import { UserAvatar } from "@/components/shared/user-avatar";
 import { describeDue, formatShort } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import type { Column, Label, Task, User } from "@/types";
+import { InlineAssignee, InlinePriority, InlineStatus } from "./inline-cells";
 
 export type ColumnKey =
   | "status"
@@ -234,96 +235,78 @@ export function TaskTable({
               </tr>
             </thead>
             <tbody>
-              {rowData.map(
-                ({ task, column, assignee, taskLabels, done }, i) => (
-                  <tr
-                    key={task.id}
-                    data-selected={selected.has(task.id)}
-                    className="animate-row-in border-b last:border-b-0 transition-colors hover:bg-muted/40 data-[selected=true]:bg-primary/5"
-                    style={{ animationDelay: `${Math.min(i, 12) * 30}ms` }}
-                  >
+              {rowData.map(({ task, taskLabels, done }, i) => (
+                <tr
+                  key={task.id}
+                  data-selected={selected.has(task.id)}
+                  className="animate-row-in border-b last:border-b-0 transition-colors hover:bg-muted/40 data-[selected=true]:bg-primary/5"
+                  style={{ animationDelay: `${Math.min(i, 12) * 30}ms` }}
+                >
+                  <td className="px-3 py-3">
+                    <Checkbox
+                      checked={selected.has(task.id)}
+                      onCheckedChange={() => onToggle(task.id)}
+                      aria-label={`Select ${task.title}`}
+                    />
+                  </td>
+                  <td className="max-w-[320px] px-3 py-3">
+                    <button
+                      type="button"
+                      onClick={() => onOpen(task.id)}
+                      className={cn(
+                        "block w-full truncate rounded text-left text-sm font-medium outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring",
+                        done && "text-muted-foreground line-through",
+                      )}
+                    >
+                      {task.title}
+                    </button>
+                  </td>
+                  {visible.has("status") && (
                     <td className="px-3 py-3">
-                      <Checkbox
-                        checked={selected.has(task.id)}
-                        onCheckedChange={() => onToggle(task.id)}
-                        aria-label={`Select ${task.title}`}
-                      />
+                      <InlineStatus task={task} />
                     </td>
-                    <td className="max-w-[320px] px-3 py-3">
-                      <button
-                        type="button"
-                        onClick={() => onOpen(task.id)}
-                        className={cn(
-                          "block w-full truncate rounded text-left text-sm font-medium outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring",
-                          done && "text-muted-foreground line-through",
-                        )}
-                      >
-                        {task.title}
-                      </button>
+                  )}
+                  {visible.has("priority") && (
+                    <td className="px-3 py-3">
+                      <InlinePriority task={task} />
                     </td>
-                    {visible.has("status") && (
-                      <td className="px-3 py-3">
-                        {column && (
-                          <StatusBadge
-                            statusKey={column.statusKey}
-                            label={column.name}
-                          />
-                        )}
-                      </td>
-                    )}
-                    {visible.has("priority") && (
-                      <td className="px-3 py-3">
-                        <PriorityIndicator priority={task.priority} />
-                      </td>
-                    )}
-                    {visible.has("assignee") && (
-                      <td className="px-3 py-3">
-                        {assignee ? (
-                          <span className="inline-flex items-center gap-2 text-sm">
-                            <UserAvatar user={assignee} size={22} />
-                            <span className="hidden truncate lg:inline">
-                              {assignee.name}
-                            </span>
-                          </span>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">
-                            Unassigned
-                          </span>
-                        )}
-                      </td>
-                    )}
-                    {visible.has("labels") && (
-                      <td className="px-3 py-3">
-                        <div className="flex flex-wrap gap-1">
-                          {taskLabels.map((l) => (
-                            <LabelChip key={l.id} label={l} />
-                          ))}
-                        </div>
-                      </td>
-                    )}
-                    {visible.has("start") && (
-                      <td className="px-3 py-3 text-sm tabular-nums text-muted-foreground">
-                        {task.startDate ? formatShort(task.startDate) : "—"}
-                      </td>
-                    )}
-                    {visible.has("due") && (
-                      <td className="px-3 py-3">
-                        <DueCell task={task} done={done} />
-                      </td>
-                    )}
-                    {visible.has("progress") && (
-                      <td className="px-3 py-3">
-                        <ProgressRing value={task.progress} />
-                      </td>
-                    )}
-                    {visible.has("hours") && (
-                      <td className="px-3 py-3 text-sm tabular-nums text-muted-foreground">
-                        {task.estimatedHours}h
-                      </td>
-                    )}
-                  </tr>
-                ),
-              )}
+                  )}
+                  {visible.has("assignee") && (
+                    <td className="px-3 py-3">
+                      <InlineAssignee task={task} />
+                    </td>
+                  )}
+                  {visible.has("labels") && (
+                    <td className="px-3 py-3">
+                      <div className="flex flex-wrap gap-1">
+                        {taskLabels.map((l) => (
+                          <LabelChip key={l.id} label={l} />
+                        ))}
+                      </div>
+                    </td>
+                  )}
+                  {visible.has("start") && (
+                    <td className="px-3 py-3 text-sm tabular-nums text-muted-foreground">
+                      {task.startDate ? formatShort(task.startDate) : "—"}
+                    </td>
+                  )}
+                  {visible.has("due") && (
+                    <td className="px-3 py-3">
+                      <DueCell task={task} done={done} />
+                    </td>
+                  )}
+                  {visible.has("progress") && (
+                    <td className="px-3 py-3">
+                      <ProgressRing value={task.progress} />
+                    </td>
+                  )}
+                  {visible.has("hours") && (
+                    <td className="px-3 py-3 text-sm tabular-nums text-muted-foreground">
+                      {task.estimatedHours}h
+                    </td>
+                  )}
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
