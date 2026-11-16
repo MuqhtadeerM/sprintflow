@@ -1,10 +1,5 @@
-import { PagePlaceholder } from "@/components/shared/page-placeholder";
+import { SettingsView } from "@/components/dashboard/settings-view";
 
 export default function SettingsPage() {
-  return (
-    <PagePlaceholder
-      title="Settings"
-      description="Settings arrive in Step 12."
-    />
-  );
+  return <SettingsView />;
 }
