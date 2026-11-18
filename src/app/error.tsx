@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -11,6 +12,8 @@ export default function ErrorPage({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const router = useRouter();
+
   useEffect(() => {
     console.error(error);
   }, [error]);
@@ -30,10 +33,7 @@ export default function ErrorPage({
       </p>
       <div className="mt-2 flex gap-2">
         <Button onClick={reset}>Try again</Button>
-        <Button
-          variant="outline"
-          onClick={() => window.location.assign("/dashboard")}
-        >
+        <Button variant="outline" onClick={() => router.push("/dashboard")}>
           Dashboard
         </Button>
       </div>

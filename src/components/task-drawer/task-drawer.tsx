@@ -26,7 +26,6 @@ import { useTaskActions } from "@/hooks/use-task-actions";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   deleteTask,
-  duplicateTask,
   setTaskDates,
   updateTask,
 } from "@/store/slices/data-slice";
@@ -316,13 +315,15 @@ function TaskDrawerBody({ task }: { task: Task }) {
           variant="outline"
           size="sm"
           onClick={() => {
-            const action = dispatch(duplicateTask(task.id));
-            toast.success("Task duplicated", {
-              action: {
-                label: "Open copy",
-                onClick: () => dispatch(openTask(action.payload.newId)),
-              },
-            });
+            const newId = duplicate(task.id);
+            if (newId) {
+              toast.success("Task duplicated", {
+                action: {
+                  label: "Open copy",
+                  onClick: () => dispatch(openTask(newId)),
+                },
+              });
+            }
           }}
         >
           <Copy className="size-4" />
