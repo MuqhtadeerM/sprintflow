@@ -1,13 +1,22 @@
 "use client";
 
+import { useRef, useState } from "react";
+import { Pencil } from "lucide-react";
+import { toast } from "sonner";
+import { CommitInput } from "@/components/shared/commit-input";
 import { PriorityIndicator } from "@/components/shared/priority-indicator";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { UserAvatar } from "@/components/shared/user-avatar";
+import { Input } from "@/components/ui/input";
 import { useTaskActions } from "@/hooks/use-task-actions";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { updateTask } from "@/store/slices/data-slice";
+import { setTaskDates, updateTask } from "@/store/slices/data-slice";
+import { describeDue } from "@/lib/date-utils";
 import { PRIORITIES, PRIORITY_META } from "@/lib/task-meta";
+import { cn } from "@/lib/utils";
 import type { Priority, Task } from "@/types";
+
+/* ---------- select overlays (status, priority, assignee) ---------- */
 
 interface OverlayProps {
   label: string;
@@ -120,5 +129,178 @@ export function InlineAssignee({ task }: { task: Task }) {
         <span className="text-sm text-muted-foreground">Unassigned</span>
       )}
     </Overlay>
+  );
+}
+
+/* ---------- title ---------- */
+
+interface InlineTitleProps {
+  task: Task;
+  done: boolean;
+  onOpen: (id: string) => void;
+}
+
+/** Click the title to open the drawer. Click the pencil to rename in place. */
+export function InlineTitle({ task, done, onOpen }: InlineTitleProps) {
+  const dispatch = useAppDispatch();
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(task.title);
+  const cancelled = useRef(false);
+
+  const finish = () => {
+    setEditing(false);
+    if (cancelled.current) {
+      cancelled.current = false;
+      return;
+    }
+    const next = draft.trim();
+    if (!next) {
+      toast.error("A task needs a title");
+      return;
+    }
+    if (next !== task.title) {
+      dispatch(
+        updateTask({
+          id: task.id,
+          changes: { title: next },
+          message: `Renamed to “${next}”`,
+        }),
+      );
+    }
+  };
+
+  if (editing) {
+    return (
+      <Input
+        autoFocus
+        value={draft}
+        maxLength={120}
+        aria-label="Task title"
+        className="h-8"
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={finish}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") e.currentTarget.blur();
+          if (e.key === "Escape") {
+            cancelled.current = true;
+            e.currentTarget.blur();
+          }
+        }}
+      />
+    );
+  }
+
+  return (
+    <div className="group/title flex items-center gap-1">
+      <button
+        type="button"
+        onClick={() => onOpen(task.id)}
+        className={cn(
+          "block min-w-0 flex-1 truncate rounded text-left text-sm font-medium outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring",
+          done && "text-muted-foreground line-through",
+        )}
+      >
+        {task.title}
+      </button>
+      <button
+        type="button"
+        aria-label={`Rename ${task.title}`}
+        onClick={() => {
+          setDraft(task.title);
+          setEditing(true);
+        }}
+        className="shrink-0 rounded p-1 text-muted-foreground opacity-100 outline-none hover:text-foreground focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring md:opacity-0 md:group-hover/title:opacity-100"
+      >
+        <Pencil className="size-3.5" />
+      </button>
+    </div>
+  );
+}
+
+/* ---------- dates and hours ---------- */
+
+const DATE_INPUT =
+  "h-8 rounded-md border border-transparent bg-transparent px-1 text-sm tabular-nums outline-none [color-scheme:light] hover:border-input focus-visible:ring-2 focus-visible:ring-ring dark:[color-scheme:dark]";
+
+export function InlineDate({
+  task,
+  field,
+}: {
+  task: Task;
+  field: "startDate" | "dueDate";
+}) {
+  const dispatch = useAppDispatch();
+  const label = field === "startDate" ? "Start date" : "Due date";
+
+  return (
+    <input
+      type="date"
+      aria-label={`${label} of ${task.title}`}
+      value={task[field] ?? ""}
+      className={DATE_INPUT}
+      onChange={(e) => {
+        const value = e.target.value || null;
+        const startDate = field === "startDate" ? value : task.startDate;
+        const dueDate = field === "dueDate" ? value : task.dueDate;
+        if (startDate && dueDate && startDate > dueDate) {
+          toast.error("The start date can't be after the due date");
+          return;
+        }
+        dispatch(setTaskDates({ id: task.id, startDate, dueDate }));
+      }}
+    />
+  );
+}
+
+/** Due date picker, plus a "Today / 2d overdue" hint when it matters. */
+export function InlineDue({ task, done }: { task: Task; done: boolean }) {
+  const info = task.dueDate ? describeDue(task.dueDate, done) : null;
+  return (
+    <div className="flex items-center gap-2">
+      <InlineDate task={task} field="dueDate" />
+      {info && info.tone !== "normal" && (
+        <span
+          className={cn(
+            "whitespace-nowrap text-xs font-medium",
+            info.tone === "overdue"
+              ? "text-red-600 dark:text-red-400"
+              : "text-amber-600 dark:text-amber-400",
+          )}
+        >
+          {info.text}
+        </span>
+      )}
+    </div>
+  );
+}
+
+export function InlineHours({ task }: { task: Task }) {
+  const dispatch = useAppDispatch();
+  return (
+    <CommitInput
+      inputMode="decimal"
+      aria-label={`Estimated hours of ${task.title}`}
+      value={String(task.estimatedHours)}
+      className="h-8 w-16 border-transparent bg-transparent px-1.5 text-sm tabular-nums shadow-none hover:border-input focus-visible:border-input"
+      onCommit={(next) => {
+        const hours = Number(next);
+        if (
+          next.trim() === "" ||
+          !Number.isFinite(hours) ||
+          hours < 0 ||
+          hours > 999
+        ) {
+          toast.error("Enter hours between 0 and 999");
+          return;
+        }
+        dispatch(
+          updateTask({
+            id: task.id,
+            changes: { estimatedHours: hours },
+            message: `Estimated ${hours}h`,
+          }),
+        );
+      }}
+    />
   );
 }

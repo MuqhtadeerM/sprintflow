@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { getDataSource } from "@/lib/data-source";
 import { bootstrap } from "./bootstrap";
 import type { AppStore } from "./index";
+import { BootSkeleton } from "@/components/shared/boot-skeleton";
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [store, setStore] = useState<AppStore | null>(null);
@@ -48,14 +49,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }
 
   if (!store) {
-    return (
-      <div
-        className="flex h-screen items-center justify-center text-sm text-muted-foreground"
-        aria-busy="true"
-      >
-        Loading SprintFlow…
-      </div>
-    );
+    return <BootSkeleton />;
   }
 
   return <Provider store={store}>{children}</Provider>;
