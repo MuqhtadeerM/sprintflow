@@ -8,10 +8,18 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { LabelChip } from "@/components/shared/label-chip";
 import { ProgressRing } from "@/components/shared/progress-ring";
 import { UserAvatar } from "@/components/shared/user-avatar";
-import { describeDue, formatShort } from "@/lib/date-utils";
+import { describeDue } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import type { Column, Label, Task, User } from "@/types";
-import { InlineAssignee, InlinePriority, InlineStatus } from "./inline-cells";
+import {
+  InlineAssignee,
+  InlineDate,
+  InlineDue,
+  InlineHours,
+  InlinePriority,
+  InlineStatus,
+  InlineTitle,
+} from "./inline-cells";
 
 export type ColumnKey =
   | "status"
@@ -250,16 +258,7 @@ export function TaskTable({
                     />
                   </td>
                   <td className="max-w-[320px] px-3 py-3">
-                    <button
-                      type="button"
-                      onClick={() => onOpen(task.id)}
-                      className={cn(
-                        "block w-full truncate rounded text-left text-sm font-medium outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring",
-                        done && "text-muted-foreground line-through",
-                      )}
-                    >
-                      {task.title}
-                    </button>
+                    <InlineTitle task={task} done={done} onOpen={onOpen} />
                   </td>
                   {visible.has("status") && (
                     <td className="px-3 py-3">
@@ -286,13 +285,13 @@ export function TaskTable({
                     </td>
                   )}
                   {visible.has("start") && (
-                    <td className="px-3 py-3 text-sm tabular-nums text-muted-foreground">
-                      {task.startDate ? formatShort(task.startDate) : "—"}
+                    <td className="px-3 py-3">
+                      <InlineDate task={task} field="startDate" />
                     </td>
                   )}
                   {visible.has("due") && (
                     <td className="px-3 py-3">
-                      <DueCell task={task} done={done} />
+                      <InlineDue task={task} done={done} />
                     </td>
                   )}
                   {visible.has("progress") && (
@@ -301,8 +300,8 @@ export function TaskTable({
                     </td>
                   )}
                   {visible.has("hours") && (
-                    <td className="px-3 py-3 text-sm tabular-nums text-muted-foreground">
-                      {task.estimatedHours}h
+                    <td className="px-3 py-3">
+                      <InlineHours task={task} />
                     </td>
                   )}
                 </tr>

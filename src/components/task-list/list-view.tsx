@@ -1,7 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check, Columns3, Plus, SearchX, X } from "lucide-react";
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Columns3,
+  Plus,
+  SearchX,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EmptyState } from "@/components/shared/empty-state";
+import { NativeSelect } from "@/components/shared/native-select";
 import {
   TaskTable,
   COLUMN_DEFS,
@@ -32,6 +41,8 @@ interface ListViewProps {
   projectId: string;
   sprintId: string | null;
 }
+
+const PAGE_SIZES = [10, 25, 50];
 
 function compareTasks(
   a: Task,
@@ -86,6 +97,8 @@ export function ListView({ projectId, sprintId }: ListViewProps) {
   const [sortKey, setSortKey] = useState<SortKey>("due");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
   const [visible, setVisible] = useState<Set<ColumnKey>>(
     new Set(["status", "priority", "assignee", "labels", "due", "progress"]),
   );
@@ -108,6 +121,14 @@ export function ListView({ projectId, sprintId }: ListViewProps) {
     });
   }, [tasks, allColumns, users, sortKey, sortDir]);
 
+  // Derived, not stored: if filters shrink the list, the page clamps by itself.
+  const pageCount = Math.max(1, Math.ceil(rows.length / pageSize));
+  const safePage = Math.min(page, pageCount);
+  const pageRows = useMemo(
+    () => rows.slice((safePage - 1) * pageSize, safePage * pageSize),
+    [rows, safePage, pageSize],
+  );
+
   // Selections for tasks that were deleted or filtered out are ignored.
   const visibleSelected = useMemo(() => {
     const ids = new Set(rows.map((t) => t.id));
@@ -120,6 +141,7 @@ export function ListView({ projectId, sprintId }: ListViewProps) {
       setSortKey(key);
       setSortDir("asc");
     }
+    setPage(1);
   };
 
   const toggleOne = (id: string) =>
@@ -130,8 +152,16 @@ export function ListView({ projectId, sprintId }: ListViewProps) {
       return next;
     });
 
+  // "Select all" applies to the rows on this page.
   const toggleAll = (checked: boolean) =>
-    setSelected(checked ? new Set(rows.map((t) => t.id)) : new Set());
+    setSelected((prev) => {
+      const next = new Set(prev);
+      for (const t of pageRows) {
+        if (checked) next.add(t.id);
+        else next.delete(t.id);
+      }
+      return next;
+    });
 
   const toggleColumn = (key: ColumnKey) =>
     setVisible((prev) => {
@@ -142,6 +172,8 @@ export function ListView({ projectId, sprintId }: ListViewProps) {
     });
 
   const filtered = hasActiveFilters(filters);
+  const from = rows.length === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const to = Math.min(safePage * pageSize, rows.length);
 
   return (
     <div className="space-y-4 pb-24">
@@ -149,6 +181,8 @@ export function ListView({ projectId, sprintId }: ListViewProps) {
         <p className="text-sm text-muted-foreground" aria-live="polite">
           {rows.length} task{rows.length === 1 ? "" : "s"}
           {filtered && " match your filters"}
+          {visibleSelected.length > 0 &&
+            ` · ${visibleSelected.length} selected`}
         </p>
 
         <Button
@@ -206,20 +240,70 @@ export function ListView({ projectId, sprintId }: ListViewProps) {
           }
         />
       ) : (
-        <TaskTable
-          tasks={rows}
-          columns={allColumns}
-          users={users}
-          labels={labels}
-          visible={visible}
-          sortKey={sortKey}
-          sortDir={sortDir}
-          onSort={handleSort}
-          selected={new Set(visibleSelected)}
-          onToggle={toggleOne}
-          onToggleAll={toggleAll}
-          onOpen={(id) => dispatch(openTask(id))}
-        />
+        <>
+          <TaskTable
+            tasks={pageRows}
+            columns={allColumns}
+            users={users}
+            labels={labels}
+            visible={visible}
+            sortKey={sortKey}
+            sortDir={sortDir}
+            onSort={handleSort}
+            selected={new Set(visibleSelected)}
+            onToggle={toggleOne}
+            onToggleAll={toggleAll}
+            onOpen={(id) => dispatch(openTask(id))}
+          />
+
+          {rows.length > PAGE_SIZES[0] && (
+            <nav
+              aria-label="Pagination"
+              className="flex flex-wrap items-center justify-between gap-3"
+            >
+              <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                Rows per page
+                <NativeSelect
+                  value={String(pageSize)}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setPage(1);
+                  }}
+                  className="h-8 w-20"
+                >
+                  {PAGE_SIZES.map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </NativeSelect>
+              </label>
+              <div className="flex items-center gap-2">
+                <span className="text-sm tabular-nums text-muted-foreground">
+                  {from}–{to} of {rows.length}
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  aria-label="Previous page"
+                  disabled={safePage <= 1}
+                  onClick={() => setPage(safePage - 1)}
+                >
+                  <ChevronLeft className="size-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  aria-label="Next page"
+                  disabled={safePage >= pageCount}
+                  onClick={() => setPage(safePage + 1)}
+                >
+                  <ChevronRight className="size-4" />
+                </Button>
+              </div>
+            </nav>
+          )}
+        </>
       )}
 
       <BulkDock
