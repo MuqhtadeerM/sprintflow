@@ -1,36 +1,204 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 SprintFlow – Project Management Application
 
-## Getting Started
+SprintFlow is a modern, responsive project management application designed to help teams plan, organize, and track their work efficiently. It provides multiple ways to manage tasks, including Kanban boards, Gantt timelines, Calendar views, and sortable task lists.
 
-First, run the development server:
+The application uses a centralized state management system, ensuring that changes made in one view are automatically reflected across all other views.
+
+## 🎬 Project Demo
+
+**Watch the application demo:** [SprintFlow – Demo Video](https://1drv.ms/v/c/b1eb5d9b2a2d82e5/IQCTGC7dX4Y7R5GjPSlAUB17AVheKtQDKOA7IS-5ZBbmmHw?e=2w2Sup)
+
+## ✨ Key Features
+
+### 📊 Dashboard
+- Overview of total, completed, in-progress, and overdue tasks.
+- Sprint progress tracking.
+- Task distribution and team workload analytics.
+- Upcoming deadlines and recent activity.
+
+### 📋 Kanban Board
+- Drag and drop tasks between columns.
+- Reorder tasks within columns.
+- Create, rename, and delete columns.
+- Configure Work-in-Progress (WIP) limits.
+- View task priorities, labels, assignees, and due dates.
+
+### 📅 Calendar View
+- Monthly, weekly, and daily calendar layouts.
+- View tasks according to their due dates.
+- Drag and drop tasks to update dates.
+- Create tasks directly from calendar dates.
+- Navigate between dates and return to today.
+
+### 📈 Gantt Timeline
+- Visualize project schedules and task durations.
+- Drag and resize task bars to update dates.
+- Manage task dependencies.
+- Track task progress.
+- Switch between day, week, and month zoom levels.
+
+### 📝 Task Management
+- Create, edit, delete, and duplicate tasks.
+- Assign priorities, labels, and team members.
+- Manage start dates, due dates, and estimated hours.
+- Add Markdown descriptions.
+- Manage checklists, comments, and activity history.
+- Track task progress and dependencies.
+
+### 📑 Sortable List View
+- View tasks in a structured table.
+- Sort and search tasks.
+- Inline task editing.
+- Manage column visibility.
+- Select multiple tasks for bulk actions.
+
+### ⚙️ Additional Features
+- Centralized Zustand state management.
+- LocalStorage persistence.
+- Shared filters across all views.
+- URL-synchronized filters.
+- Undo and redo functionality.
+- Keyboard shortcuts.
+- Light and dark themes.
+- Responsive design for desktop, tablet, and mobile.
+- Toast notifications and confirmation dialogs.
+
+## 🛠️ Technology Stack
+
+| Technology | Purpose |
+|---|---|
+| Next.js | React framework and application routing |
+| React | User interface development |
+| TypeScript | Type safety |
+| Tailwind CSS v4 | Styling and responsive layouts |
+| shadcn/ui | Reusable UI components |
+| Zustand | Centralized state management |
+| @dnd-kit | Drag-and-drop interactions |
+| date-fns | Date manipulation |
+| React Markdown | Markdown rendering |
+| Recharts | Dashboard charts and analytics |
+| Lucide React | Icons |
+| LocalStorage | Client-side data persistence |
+
+## 🏗️ Application Architecture
+
+SprintFlow uses a centralized data architecture.
+
+All project tasks are maintained in a shared Zustand store. The Kanban Board, Gantt Timeline, Calendar, and List views consume the same dataset.
+
+This ensures that updating a task in one view automatically updates the other views without maintaining separate datasets.
+
+**Data flow:**
+
+`Centralized Zustand Store → Kanban | Gantt | Calendar | List`
+
+## 📁 Project Structure
+
+```text
+sprintflow/
+├── src/
+│   ├── app/
+│   │   ├── dashboard/
+│   │   ├── projects/
+│   │   ├── calendar/
+│   │   ├── timeline/
+│   │   ├── settings/
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   │
+│   ├── components/
+│   │   ├── layout/
+│   │   ├── sidebar/
+│   │   ├── header/
+│   │   ├── dashboard/
+│   │   ├── kanban/
+│   │   ├── gantt/
+│   │   ├── calendar/
+│   │   ├── task-list/
+│   │   ├── task-drawer/
+│   │   ├── filters/
+│   │   └── ui/
+│   │
+│   ├── store/
+│   ├── hooks/
+│   ├── lib/
+│   ├── types/
+│   └── data/
+│
+├── public/
+├── package.json
+└── README.md
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 20 or later
+- npm
+
+### 1. Clone the Repository
+
+```bash
+git clone YOUR_GITHUB_REPOSITORY_URL
+```
+
+### 2. Navigate to the Project
+
+```bash
+cd sprintflow
+```
+
+### 3. Install Dependencies
+
+```bash
+npm install
+```
+
+### 4. Start the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 5. Open in Browser
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Visit:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```text
+http://localhost:3000
+```
 
-## Learn More
+## 💾 Data Persistence
 
-To learn more about Next.js, take a look at the following resources:
+SprintFlow uses browser LocalStorage to persist project data.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Changes are saved locally.
+- Data is restored when the application is refreshed.
+- No external backend or database is required.
+- The application uses realistic mock data for demonstration.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🎯 Project Objectives
 
-## Deploy on Vercel
+- Build a functional project management application.
+- Provide multiple synchronized task management views.
+- Implement reusable and maintainable React components.
+- Demonstrate centralized state management.
+- Build interactive drag-and-drop functionality.
+- Provide a responsive and professional user experience.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🔮 Future Improvements
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Real backend API integration.
+- User authentication and role-based access.
+- Real-time collaboration.
+- Cloud-based data storage.
+- Team notifications and activity updates.
+
+## 👨‍💻 Author
+
+**Muhammed Muqhtadeer Muzawar**
+
+---
+
+⭐ If you find this project useful, consider giving the repository a star!
