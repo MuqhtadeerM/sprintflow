@@ -693,10 +693,10 @@ export function GanttChart({ projectId, sprintId, sprint }: GanttChartProps) {
               })}
             </div>
 
-            {/* Timeline */}
+            {/* Timeline: isolate keeps it under the sticky names; overflow-hidden clips bars to the chart */}
             <div
               ref={timelineRef}
-              className="relative shrink-0"
+              className="relative isolate shrink-0 overflow-hidden"
               style={{ width: totalWidth, height: bodyHeight }}
             >
               {/* Grid lines and weekend shading */}
@@ -741,6 +741,20 @@ export function GanttChart({ projectId, sprintId, sprint }: GanttChartProps) {
                 const span = spanFor(task.id);
                 const column = columnById.get(task.columnId);
                 const done = column?.statusKey === "done";
+
+                // Clamp the bar to the chart area
+                let barLeft = 0;
+                let barWidth = ppd;
+                if (span) {
+                  const rawLeft = daysBetween(range.start, span.start) * ppd;
+                  const rawRight = rawLeft + durationDays(span) * ppd;
+                  barLeft = Math.max(0, rawLeft);
+                  barWidth = Math.max(
+                    ppd,
+                    Math.min(rawRight, totalWidth) - barLeft,
+                  );
+                }
+
                 return (
                   <div
                     key={task.id}
@@ -751,8 +765,8 @@ export function GanttChart({ projectId, sprintId, sprint }: GanttChartProps) {
                       <GanttBar
                         task={task}
                         span={span}
-                        left={daysBetween(range.start, span.start) * ppd}
-                        width={durationDays(span) * ppd}
+                        left={barLeft}
+                        width={barWidth}
                         color={
                           done ? DONE_COLOR : PRIORITY_META[task.priority].color
                         }
