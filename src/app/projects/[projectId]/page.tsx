@@ -5,9 +5,9 @@ import { ProjectOverview } from "@/components/dashboard/project-overview";
 import { FilterChips } from "@/components/filters/filter-chips";
 import { Board } from "@/components/kanban/board";
 import { CalendarView } from "@/components/calendar/calendar-view";
+import { GanttChart } from "@/components/gantt/gantt-chart";
 import { ListView } from "@/components/task-list/list-view";
 import { useProjectContext } from "@/hooks/use-project-context";
-import { GanttChart } from "@/components/gantt/gantt-chart";
 
 export default function ProjectPage() {
   const { projectId, project, sprintId, sprint, view } = useProjectContext();
@@ -42,12 +42,6 @@ export default function ProjectPage() {
       )}
       {view === "calendar" && (
         <CalendarView projectId={projectId} sprintId={sprintId} />
-      )}
-      {view === "gantt" && (
-        <PagePlaceholder
-          title="Gantt view"
-          description="The Gantt timeline arrives in Step 10."
-        />
       )}
       {view === "gantt" && (
         <GanttChart projectId={projectId} sprintId={sprintId} sprint={sprint} />
