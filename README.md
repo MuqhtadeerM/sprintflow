@@ -1,72 +1,36 @@
-# SprintFlow
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-A sprint-planning app where one dataset drives four synchronized views: Kanban, Gantt, Calendar and List.
-Change a task in one view and every other view updates.
+## Getting Started
 
-**Demo:** _add your Loom or MP4 link here_
-
-Built with Next.js 16, React, TypeScript (strict), Tailwind CSS v4, shadcn/ui, Redux Toolkit,
-@dnd-kit, date-fns, Recharts and react-markdown. No backend or auth is required.
-
-## Quick start
+First, run the development server:
 
 ```bash
-npm install
-cp .env.example .env.local      # Windows: copy .env.example .env.local
-npm run dev                     # http://localhost:3000
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-Requires Node 20+.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Scripts
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-| Command                       | Purpose                                                                  |
-| ----------------------------- | ------------------------------------------------------------------------ |
-| `npm run dev`                 | Development server                                                       |
-| `npm run typecheck`           | TypeScript check                                                         |
-| `npm run lint`                | ESLint                                                                   |
-| `npm run build` / `npm start` | Production build and server                                              |
-| `npm run demo`                | Record an MP4 walkthrough with Cypress (needs `build` + `start` running) |
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Data modes
+## Learn More
 
-Set `NEXT_PUBLIC_DATA_SOURCE` in `.env.local`, then restart the dev server:
+To learn more about Next.js, take a look at the following resources:
 
-- `local` (default): data lives in the browser's localStorage.
-- `http`: data is saved through `/api/*` into `.data/db.json`.
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-The UI only talks to a small `DataSource` interface (`src/lib/data-source`). To use a real database,
-rewrite the two route handlers in `src/app/api`. The first run seeds sample data.
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Architecture
+## Deploy on Vercel
 
-- **One store.** Every view reads and writes the same Redux `data` slice.
-- **Status comes from the column.** A task stores `columnId`; each column maps to a status category.
-- **URL as state.** View, sprint, filters, calendar mode and date live in the query string.
-- **Filters in one place.** `useProjectTasks` applies the shared filters, and all four views use it.
-- **Sync and history middleware.** Changed rows are saved optimistically with retry. Undo/redo uses snapshots.
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-## Features
-
-- **Kanban:** drag whole cards between and within columns, add/rename/delete columns, WIP limits, context menu.
-- **Task drawer:** Markdown description, checklist, comments, activity, dependencies, mock attachments.
-- **Gantt:** draggable and resizable bars, dependency arrows, conflict highlighting, day/week/month zoom.
-- **Calendar:** month, week and day views, drag to reschedule, create by date.
-- **List:** sortable, paginated, inline editing, bulk actions.
-- **Shared:** URL-synced filters, undo/redo, keyboard shortcuts, dark mode, dashboard, reports (CSV), notifications.
-
-## Keyboard shortcuts
-
-`C` new task · `F` or `/` search · `Ctrl/Cmd+Z` undo · `Ctrl/Cmd+Shift+Z` redo · `Esc` close · `?` help
-
-## Known limitations
-
-- No authentication. The current user is the workspace lead.
-- No multi-user conflict handling (last write wins).
-- Attachments store file names and sizes only.
-- Undo history is in memory and resets on refresh.
-- The JSON-file API does not work on serverless hosts.
-- List: no column resizing. Inline editing covers title, status, priority, assignee, dates and hours.
-- Gantt: no edge auto-scroll while dragging, and dependencies are finish-to-start only.
-- Kanban columns can't be reordered by dragging.
-- One workspace only.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
